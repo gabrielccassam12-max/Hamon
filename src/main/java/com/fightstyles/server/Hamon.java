@@ -33,7 +33,7 @@ public final class Hamon {
     /** Sparks on the victim; undead and vampires also catch fire. */
     public static void mark(ServerWorld w, LivingEntity e) {
         boolean vamp = e instanceof ServerPlayerEntity v && Fighter.get(v).has(Style.VAMPIRE);
-        if (vamp || e.isUndead()) {
+        if (vamp || e.getType().isIn(net.minecraft.registry.tag.EntityTypeTags.UNDEAD)) {
             e.setOnFireFor(5);
             Fx.burst(w, "h_big", Ops.center(e), 3, 0.12, 0.2);
         }
