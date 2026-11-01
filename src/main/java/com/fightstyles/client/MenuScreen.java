@@ -20,6 +20,7 @@ public class MenuScreen extends Screen {
     private static int lastTab = 0;
     private int tab = lastTab;
     private int style = 0;
+    private static final int N = Style.values().length;
 
     public MenuScreen() {
         super(Text.translatable("menu.fightstyles.title"));
@@ -41,26 +42,29 @@ public class MenuScreen extends Screen {
             }).dimensions(x + i * tw + 2, y + 4, tw - 4, 18).build());
         }
         if (tab == 1) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < N; i++) {
                 final int idx = i;
                 addDrawableChild(ButtonWidget.builder(Style.values()[i].displayName(), b -> {
                     style = idx;
                     clearAndInit();
-                }).dimensions(x + 10 + i * 100, y + 28, 96, 16).build());
+                }).dimensions(x + 8 + i * 69, y + 28, 67, 16).build());
             }
         }
         if (tab == 0) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < N; i++) {
                 final int idx = i;
                 SyncPayload s = ClientState.last;
                 boolean has = s != null && (s.unlocked() & Style.values()[i].bit()) != 0;
                 ButtonWidget w = ButtonWidget.builder(Text.translatable("menu.fightstyles.use"), b -> {
-                    for (int k = 0; k < 3; k++) {
-                        SyncPayload c = ClientState.last;
-                        if (c != null && c.active() == idx) break;
-                        ClientPlayNetworking.send(new ActionPayload(1, 0));
+                    SyncPayload c = ClientState.last;
+                    if (c == null) return;
+                    int cur = Math.max(0, c.active()), steps = 0;
+                    while (cur != idx && steps < N) {
+                        cur = (cur + 1) % N;
+                        if ((c.unlocked() & Style.values()[cur].bit()) != 0) steps++;
                     }
-                }).dimensions(x + 10 + i * 116, y + H - 28, 100, 16).build();
+                    for (int k = 0; k < steps; k++) ClientPlayNetworking.send(new ActionPayload(1, 0));
+                }).dimensions(x + 8 + i * 69, y + H - 28, 67, 16).build();
                 w.active = has;
                 addDrawableChild(w);
             }
@@ -93,31 +97,31 @@ public class MenuScreen extends Screen {
     }
 
     private void overview(DrawContext g, SyncPayload s, int x, int y) {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < N; i++) {
             Style st = Style.values()[i];
-            int cx = x + 10 + i * 116;
+            int cx = x + 8 + i * 69;
             boolean has = (s.unlocked() & st.bit()) != 0;
             int xp = i < s.xp().size() ? s.xp().get(i) : 0;
             int rank = SData.rankOf(xp);
-            g.fill(cx, y + 30, cx + 108, y + H - 34, 0x80000000);
-            g.drawBorder(cx, y + 30, 108, H - 64, (has ? 0xFF000000 : 0x60000000) | st.color);
-            g.drawTextWithShadow(textRenderer, st.displayName(), cx + 6, y + 36, (0xFF000000) | st.color);
+            g.fill(cx, y + 30, cx + 67, y + H - 34, 0x80000000);
+            g.drawBorder(cx, y + 30, 67, H - 64, (has ? 0xFF000000 : 0x60000000) | st.color);
+            g.drawTextWithShadow(textRenderer, st.displayName(), cx + 4, y + 36, (0xFF000000) | st.color);
             if (!has) {
-                g.drawTextWrapped(textRenderer, Text.translatable("menu.fightstyles.how." + st.name().toLowerCase(Locale.ROOT)), cx + 6, y + 54, 96, 0xFFB8C4D0);
+                g.drawTextWrapped(textRenderer, Text.translatable("menu.fightstyles.how." + st.name().toLowerCase(Locale.ROOT)), cx + 4, y + 54, 60, 0xFFB8C4D0);
                 continue;
             }
-            g.drawTextWithShadow(textRenderer, Text.translatable("rank.fightstyles." + rank), cx + 6, y + 50, 0xFFFFD35A);
+            g.drawTextWithShadow(textRenderer, Text.translatable("rank.fightstyles." + rank), cx + 4, y + 50, 0xFFFFD35A);
             float mp = rank >= 5 ? 1f : (float) (xp - SData.RANK_XP[rank]) / (SData.RANK_XP[rank + 1] - SData.RANK_XP[rank]);
-            g.fill(cx + 6, y + 64, cx + 102, y + 68, 0xFF202830);
-            g.fill(cx + 6, y + 64, cx + 6 + (int) (96 * mp), y + 68, 0xFFFFD35A);
-            g.drawTextWithShadow(textRenderer, "XP " + xp, cx + 6, y + 74, 0xFFC8D8E8);
-            if (s.active() == i) g.drawTextWithShadow(textRenderer, Text.translatable("menu.fightstyles.active"), cx + 6, y + 88, 0xFF7CFF9A);
+            g.fill(cx + 4, y + 64, cx + 63, y + 68, 0xFF202830);
+            g.fill(cx + 4, y + 64, cx + 4 + (int) (59 * mp), y + 68, 0xFFFFD35A);
+            g.drawTextWithShadow(textRenderer, "XP " + xp, cx + 4, y + 74, 0xFFC8D8E8);
+            if (s.active() == i) g.drawTextWithShadow(textRenderer, Text.translatable("menu.fightstyles.active"), cx + 4, y + 88, 0xFF7CFF9A);
             int n = 0;
             for (int k = 0; k < 7; k++) {
                 Skill sk = Skill.of(st, k);
                 if (sk != null && rank >= sk.minRank) n++;
             }
-            g.drawTextWithShadow(textRenderer, Text.translatable("menu.fightstyles.techs", n, 7), cx + 6, y + 102, 0xFFB8C4D0);
+            g.drawTextWithShadow(textRenderer, Text.translatable("menu.fightstyles.techs", n, 7), cx + 4, y + 102, 0xFFB8C4D0);
         }
     }
 
@@ -142,10 +146,10 @@ public class MenuScreen extends Screen {
     }
 
     private void stats(DrawContext g, SyncPayload s, int x, int y) {
-        String[] keys = {"casts", "kills_hamon", "kills_spin", "kills_vampire", "bites", "undead"};
+        String[] keys = {"casts", "kills_hamon", "kills_spin", "kills_vampire", "kills_bubble", "kills_kars", "bites", "undead"};
         for (int i = 0; i < keys.length; i++) {
             int v = i < s.stats().size() ? s.stats().get(i) : 0;
-            g.drawTextWithShadow(textRenderer, Text.translatable("menu.fightstyles.stat." + keys[i]).append(": " + v), x + 20, y + 40 + i * 16, 0xFFFFFFFF);
+            g.drawTextWithShadow(textRenderer, Text.translatable("menu.fightstyles.stat." + keys[i]).append(": " + v), x + 20, y + 36 + i * 15, 0xFFFFFFFF);
         }
     }
 

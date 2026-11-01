@@ -38,6 +38,16 @@ public final class ModParticles {
         PROFILES.put("v_mist",  new CubeProfile(0x5A1428, 0x34101C, 0x180810, 0.38f, 0.16f, 28, 10, -0.002f, 0.94f, 1.008f, 5f,  1f,    0.45f, false));
         PROFILES.put("v_ring",  new CubeProfile(0xFF9AA8, 0xD01430, 0x5A0818, 0.15f, 0.03f, 5,  1, 0.0f,    1.00f, 0.900f, 0f,  0.25f, 0.90f, false));
         PROFILES.put("v_frost", new CubeProfile(0xFFFFFF, 0xCDEBFF, 0x7EB8E8, 0.16f, 0.06f, 22, 8, 0.002f,  0.95f, 0.975f, 12f, 1f,    0.90f, true));
+        // ---- bubble hamon: translucent soap colours (cyan -> pink -> lilac)
+        PROFILES.put("b_spark", new CubeProfile(0xFFFFFF, 0x9FE8FF, 0xF2A8FF, 0.17f, 0.07f, 16, 6, -0.004f, 0.94f, 0.965f, 14f, 1f,    0.60f, true));
+        PROFILES.put("b_big",   new CubeProfile(0xF4FDFF, 0x8CE0FF, 0xC9A0FF, 0.55f, 0.22f, 14, 5, -0.003f, 0.90f, 0.950f, 6f,  1f,    0.40f, true));
+        PROFILES.put("b_irid",  new CubeProfile(0xFFFFFF, 0xFFD6F6, 0x9FE8FF, 0.13f, 0.04f, 10, 3, -0.002f, 0.96f, 0.940f, 0f,  0.40f, 0.80f, true));
+        PROFILES.put("b_ring",  new CubeProfile(0xE8FBFF, 0x7CDCFF, 0xB890FF, 0.15f, 0.03f, 5,  1, 0.0f,    1.00f, 0.900f, 0f,  0.25f, 0.85f, false));
+        // ---- kars: white light -> violet -> deep crimson
+        PROFILES.put("k_spark", new CubeProfile(0xFFFFFF, 0xD7BEFF, 0x8A2C5E, 0.17f, 0.07f, 15, 5, 0.0f,    0.92f, 0.960f, 20f, 1f,    0.90f, true));
+        PROFILES.put("k_big",   new CubeProfile(0xFFF4FF, 0xB58CFF, 0x5E1448, 0.54f, 0.20f, 12, 4, 0.0f,    0.89f, 0.935f, 7f,  1f,    0.55f, true));
+        PROFILES.put("k_light", new CubeProfile(0xFFFFFF, 0xFFFFFF, 0xCDB4FF, 0.12f, 0.02f, 7,  2, 0.0f,    0.98f, 0.930f, 0f,  0.30f, 1.00f, true));
+        PROFILES.put("k_ring",  new CubeProfile(0xF4E8FF, 0xB58CFF, 0x6A1850, 0.15f, 0.03f, 5,  1, 0.0f,    1.00f, 0.900f, 0f,  0.25f, 0.90f, false));
         PROFILES.put("v_bat",   new CubeProfile(0x4A3A5C, 0x241830, 0x0C0614, 0.22f, 0.08f, 22, 8, 0.0f,    0.93f, 0.975f, 30f, 1f,    1.00f, false));
     }
 

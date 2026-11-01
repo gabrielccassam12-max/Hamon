@@ -30,7 +30,21 @@ public enum Skill {
     EYE_JETS(Style.VAMPIRE, 3, 2, 26, 100, 2, 10),
     BLOOD_FRENZY(Style.VAMPIRE, 4, 2, 30, 260, 4, 14),
     FREEZE_TOUCH(Style.VAMPIRE, 5, 3, 34, 160, 6, 14),
-    NIGHT_DOMINION(Style.VAMPIRE, 6, 4, 60, 360, 3, 40);
+    NIGHT_DOMINION(Style.VAMPIRE, 6, 4, 60, 360, 3, 40),
+    // ---- BUBBLE HAMON (Caesar)
+    BUBBLE_SHOT(Style.BUBBLE, 0, 0, 6, 16, 1, 8),
+    BUBBLE_BARRIER(Style.BUBBLE, 1, 1, 20, 220, 4, 14),
+    BUBBLE_CUTTER(Style.BUBBLE, 2, 1, 18, 70, 2, 10),
+    BUBBLE_TRAP(Style.BUBBLE, 3, 2, 24, 120, 1, 10),
+    BUBBLE_BOMB(Style.BUBBLE, 4, 3, 34, 160, 1, 12),
+    BUBBLE_STORM(Style.BUBBLE, 5, 4, 60, 340, 3, 36),
+    // ---- KARS (Ultimate Being)
+    ARM_BLADE(Style.KARS, 0, 0, 6, 16, 1, 8),
+    FLESH_SPIKES(Style.KARS, 1, 1, 18, 90, 4, 12),
+    LIGHT_BLADE(Style.KARS, 2, 2, 22, 70, 1, 10),
+    DIVINE_SANDALS(Style.KARS, 3, 2, 24, 100, 5, 10),
+    WIND_VORTEX(Style.KARS, 4, 3, 36, 180, 3, 26),
+    ULTIMATE_FORM(Style.KARS, 5, 4, 60, 400, 3, 40);
 
     public final Style style;
     public final int slot, minRank, cost, cooldown, pose, poseTicks;

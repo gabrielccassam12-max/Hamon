@@ -6,7 +6,9 @@ import net.minecraft.text.Text;
 public enum Style {
     HAMON(0xFFC93C, "h_ring", "h_spark", "h_big", "h_ray"),
     SPIN(0x4DF0A8, "sp_ring", "sp_spark", "sp_big", "sp_swirl"),
-    VAMPIRE(0xD0102E, "v_ring", "v_drop", "v_big", "v_mist");
+    VAMPIRE(0xD0102E, "v_ring", "v_drop", "v_big", "v_mist"),
+    BUBBLE(0x6FD6FF, "b_ring", "b_spark", "b_big", "b_irid"),
+    KARS(0xB58CFF, "k_ring", "k_spark", "k_big", "k_light");
 
     public final int color;
     public final String ring, small, big, accent;

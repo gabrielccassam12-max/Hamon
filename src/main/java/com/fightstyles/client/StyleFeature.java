@@ -47,7 +47,7 @@ public class StyleFeature extends FeatureRenderer<AbstractClientPlayerEntity, Pl
             matrices.pop();
         }
         Style act = Style.of(v.active);
-        if (act == Style.HAMON || act == Style.SPIN) {
+        if (act == Style.HAMON || act == Style.SPIN || act == Style.BUBBLE || act == Style.KARS) {
             int col = act.color;
             for (int side = 0; side < 2; side++) {
                 ModelPart arm = side == 0 ? m.rightArm : m.leftArm;

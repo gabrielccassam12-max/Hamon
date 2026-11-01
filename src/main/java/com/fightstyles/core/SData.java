@@ -9,13 +9,14 @@ import java.util.List;
 /**
  * Saved with the player and kept after death.
  * unlocked: bit per Style. active: Style ordinal in use (-1 none). xp / energy: one entry per style.
- * stats: 0 techniques used, 1..3 defeats per style, 4 bites, 5 undead defeated.
+ * stats: 0 techniques used, 1..5 defeats per style, 6 bites, 7 undead defeated.
  */
 public record SData(int unlocked, int active, List<Integer> xp, List<Integer> energy, List<Integer> stats) {
-    public static final int ST_CASTS = 0, ST_KILLS = 1, ST_BITES = 4, ST_UNDEAD = 5, STATS = 6;
+    public static final int ST_CASTS = 0, ST_KILLS = 1, ST_BITES = 6, ST_UNDEAD = 7, STATS = 8;
+    private static final int NS = Style.values().length;
     public static final int[] RANK_XP = {0, 120, 400, 1000, 2200, 4000};
 
-    public static final SData DEFAULT = new SData(0, -1, blank(3), blank(3), blank(STATS));
+    public static final SData DEFAULT = new SData(0, -1, blank(NS), blank(NS), blank(STATS));
 
     public static final Codec<SData> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.INT.fieldOf("unlocked").forGetter(SData::unlocked),
@@ -78,9 +79,9 @@ public record SData(int unlocked, int active, List<Integer> xp, List<Integer> en
 
     public SData withUnlocked(int v) { return new SData(v, active, xp, energy, stats); }
     public SData withActive(int v) { return new SData(unlocked, v, xp, energy, stats); }
-    public SData withXp(Style s, int v) { return new SData(unlocked, active, put(xp, s.ordinal(), v, 3), energy, stats); }
+    public SData withXp(Style s, int v) { return new SData(unlocked, active, put(xp, s.ordinal(), v, NS), energy, stats); }
     public SData withEnergy(Style s, int v) {
-        return new SData(unlocked, active, xp, put(energy, s.ordinal(), Math.max(0, Math.min(maxEnergy(s), v)), 3), stats);
+        return new SData(unlocked, active, xp, put(energy, s.ordinal(), Math.max(0, Math.min(maxEnergy(s), v)), NS), stats);
     }
     public SData addStat(int i, int n) { return new SData(unlocked, active, xp, energy, put(stats, i, at(stats, i) + n, STATS)); }
 }

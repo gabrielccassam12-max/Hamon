@@ -53,11 +53,24 @@ public final class ModItems {
     public static final Item STEEL_BALL = Registry.register(Registries.ITEM, FightStyles.id("steel_ball"),
             new Trigger(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON), Fighter::useBall, false));
 
+    /** Caesar's gloves: learn the Bubble Hamon. */
+    public static final Item CAESAR_GLOVES = Registry.register(Registries.ITEM, FightStyles.id("caesar_gloves"),
+            new Trigger(new Item.Settings().maxCount(16).rarity(Rarity.RARE), Fighter::useGloves, true));
+    /** Red Stone of Aja: becomes the Ultimate Being. */
+    public static final Item AJA_STONE = Registry.register(Registries.ITEM, FightStyles.id("aja_stone"),
+            new Trigger(new Item.Settings().maxCount(1).rarity(Rarity.EPIC), Fighter::useAja, true));
+    /** Spawns a rival fighter (Hamon, Spin, vampire or Kars). */
+    public static final Item RIVAL_EGG = Registry.register(Registries.ITEM, FightStyles.id("rival_spawn_egg"),
+            new net.minecraft.item.SpawnEggItem(com.fightstyles.entity.ModEntities.RIVAL, 0xFFC93C, 0x2A1A3A, new Item.Settings()));
+
     public static void init() {
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(e -> e.add(RIVAL_EGG));
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(e -> {
             e.add(STONE_MASK);
             e.add(HAMON_MANUAL);
             e.add(STEEL_BALL);
+            e.add(CAESAR_GLOVES);
+            e.add(AJA_STONE);
         });
     }
 }

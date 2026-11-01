@@ -121,6 +121,8 @@ public final class Fighter {
                             case HAMON -> sun ? 2.0 : 1.0;
                             case SPIN -> 1.0;
                             case VAMPIRE -> sun ? 0.0 : (w.isNight() || !w.isSkyVisible(p.getBlockPos().up())) ? 0.5 : 0.0;
+                            case BUBBLE -> sun ? 2.0 : 1.0;
+                            case KARS -> 1.0;
                         };
                         int whole = (int) Math.floor(add * StyleConfig.INSTANCE.energyRegenMultiplier + R.nextDouble());
                         if (whole > 0) {
@@ -131,6 +133,10 @@ public final class Fighter {
                     set(p, d);
                 }
                 if (d.has(Style.VAMPIRE) && tick % 20 == 0) vampirePassive(p, s, d, w, sun);
+                if (d.has(Style.KARS) && tick % 40 == 0) {                          // the Ultimate Being: faster, lighter, no sun problem
+                    p.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 100, 0, true, false, false));
+                    p.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 100, 0, true, false, false));
+                }
                 if (s.frenzyUntil > w.getTime() && tick % 10 == 0) {                 // frenzy: feeds on whatever is close
                     for (LivingEntity e : Ops.around(w, p.getPos().add(0, 1, 0), 3.0, p)) {
                         Ops.hurt(w, e, p, 1.5f);
@@ -157,7 +163,7 @@ public final class Fighter {
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (GUARD) return true;
             if (!(entity instanceof ServerPlayerEntity sp)) {
-                if (entity.getType().isIn(net.minecraft.registry.tag.EntityTypeTags.UNDEAD) && source.getAttacker() instanceof ServerPlayerEntity ap && get(ap).style() == Style.HAMON) {
+                if (undeadLike(entity) && source.getAttacker() instanceof ServerPlayerEntity ap && hamonUser(get(ap).style())) {
                     GUARD = true;
                     try {
                         entity.damage(source, amount * (float) StyleConfig.INSTANCE.undeadBonus);
@@ -173,7 +179,7 @@ public final class Fighter {
             PState s = STATES.get(sp.getUuid());
             long now = sp.getWorld().getTime();
             float amt = amount;
-            if (source.getAttacker() instanceof ServerPlayerEntity ap && ap != sp && get(ap).style() == Style.HAMON && get(sp).has(Style.VAMPIRE)) {
+            if (source.getAttacker() instanceof ServerPlayerEntity ap && ap != sp && hamonUser(get(ap).style()) && (get(sp).has(Style.VAMPIRE) || get(sp).has(Style.KARS))) {
                 amt *= (float) StyleConfig.INSTANCE.undeadBonus;                     // the Hamon burns vampires
                 sp.setOnFireFor(4);
             }
@@ -210,12 +216,23 @@ public final class Fighter {
             if (st == null || s == null || world.getTime() - s.lastCast > 80) return;
             addXp(sp, st, 10);
             d = get(sp).addStat(SData.ST_KILLS + st.ordinal(), 1);
-            if (killed.getType().isIn(net.minecraft.registry.tag.EntityTypeTags.UNDEAD)) d = d.addStat(SData.ST_UNDEAD, 1);
+            if (undeadLike(killed)) d = d.addStat(SData.ST_UNDEAD, 1);
             set(sp, d);
             if (st == Style.VAMPIRE) gainBlood(sp, 12);
         });
 
         registerCommands();
+    }
+
+    public static boolean hamonUser(Style s) {
+        return s == Style.HAMON || s == Style.BUBBLE;
+    }
+
+    /** Undead mobs, vampires, Kars and the vampire / Kars rivals: what the Hamon burns. */
+    public static boolean undeadLike(LivingEntity e) {
+        if (e.getType().isIn(net.minecraft.registry.tag.EntityTypeTags.UNDEAD)) return true;
+        if (e instanceof com.fightstyles.entity.Rival r) return r.variant() >= 2;
+        return e instanceof ServerPlayerEntity v && (get(v).has(Style.VAMPIRE) || get(v).has(Style.KARS));
     }
 
     private static void vampirePassive(ServerPlayerEntity p, PState s, SData d, ServerWorld w, boolean sun) {
@@ -360,6 +377,18 @@ public final class Fighter {
             case BLOOD_FRENZY -> Vampire.frenzy(c, s);
             case FREEZE_TOUCH -> Vampire.freeze(c);
             case NIGHT_DOMINION -> Vampire.night(c);
+            case BUBBLE_SHOT -> Bubble.shot(c);
+            case BUBBLE_BARRIER -> Bubble.barrier(c);
+            case BUBBLE_CUTTER -> Bubble.cutter(c);
+            case BUBBLE_TRAP -> Bubble.trap(c);
+            case BUBBLE_BOMB -> Bubble.bomb(c);
+            case BUBBLE_STORM -> Bubble.storm(c);
+            case ARM_BLADE -> Kars.armBlade(c);
+            case FLESH_SPIKES -> Kars.spikes(c);
+            case LIGHT_BLADE -> Kars.lightBlade(c);
+            case DIVINE_SANDALS -> Kars.sandals(c);
+            case WIND_VORTEX -> Kars.vortex(c);
+            case ULTIMATE_FORM -> Kars.ultimate(c);
         };
     }
 
@@ -400,7 +429,7 @@ public final class Fighter {
 
     public static boolean useMask(ServerPlayerEntity p) {
         SData d = get(p);
-        if (d.has(Style.HAMON)) {
+        if (d.has(Style.HAMON) || d.has(Style.BUBBLE)) {
             note(p, "message.fightstyles.mask_rejects", Formatting.RED);
             return false;
         }
@@ -416,9 +445,43 @@ public final class Fighter {
         return true;
     }
 
+    public static boolean useGloves(ServerPlayerEntity p) {
+        SData d = get(p);
+        if (d.has(Style.VAMPIRE) || d.has(Style.KARS)) {
+            note(p, "message.fightstyles.hamon_rejects", Formatting.RED);
+            return false;
+        }
+        if (d.has(Style.BUBBLE)) {
+            addXp(p, Style.BUBBLE, 100);
+            note(p, "message.fightstyles.trained", Formatting.GOLD);
+            sync(p);
+            return true;
+        }
+        Snd.play(world(p), p.getPos(), SoundEvents.ENTITY_GENERIC_SPLASH, 1.0f, 1.5f);
+        unlock(p, Style.BUBBLE);
+        return true;
+    }
+
+    public static boolean useAja(ServerPlayerEntity p) {
+        SData d = get(p);
+        if (d.has(Style.HAMON) || d.has(Style.BUBBLE)) {
+            note(p, "message.fightstyles.aja_rejects", Formatting.RED);
+            return false;
+        }
+        if (d.has(Style.KARS)) {
+            note(p, "message.fightstyles.already", Formatting.GRAY);
+            return false;
+        }
+        ServerWorld w = world(p);
+        Snd.play(w, p.getPos(), SoundEvents.ENTITY_WITHER_SPAWN, 1.0f, 1.8f);
+        for (int i = 0; i < 8; i++) Fx.vel(w, "k_light", p.getEyePos().add(Fx.jitter(0.3)), new Vec3d(R.nextGaussian() * 0.1, 0.08, R.nextGaussian() * 0.1));
+        unlock(p, Style.KARS);
+        return true;
+    }
+
     public static boolean useManual(ServerPlayerEntity p) {
         SData d = get(p);
-        if (d.has(Style.VAMPIRE)) {
+        if (d.has(Style.VAMPIRE) || d.has(Style.KARS)) {
             note(p, "message.fightstyles.hamon_rejects", Formatting.RED);
             return false;
         }
@@ -473,8 +536,21 @@ public final class Fighter {
             case "hamon" -> Style.HAMON;
             case "spin", "rotacao", "rotação" -> Style.SPIN;
             case "vampire", "vampiro", "vampirismo" -> Style.VAMPIRE;
+            case "bubble", "bolha", "bolhas", "cezar", "caesar" -> Style.BUBBLE;
+            case "kars", "aja" -> Style.KARS;
             default -> null;
         };
+    }
+
+    private static int spawnRival(ServerPlayerEntity p, int variant) {
+        ServerWorld w = world(p);
+        com.fightstyles.entity.Rival r = com.fightstyles.entity.ModEntities.RIVAL.create(w);
+        if (r == null) return 0;
+        Vec3d at = p.getPos().add(Ops.flat(p.getRotationVec(1f)).multiply(5));
+        r.refreshPositionAndAngles(at.x, at.y, at.z, p.getYaw() + 180f, 0f);
+        r.setVariant(variant < 0 ? R.nextInt(4) : variant);
+        w.spawnEntity(r);
+        return 1;
     }
 
     private static void registerCommands() {
@@ -518,6 +594,9 @@ public final class Fighter {
                             sync(p);
                             return 1;
                         })))
+                        .then(CommandManager.literal("rival").executes(ctx -> spawnRival(ctx.getSource().getPlayerOrThrow(), -1))
+                                .then(CommandManager.argument("variant", IntegerArgumentType.integer(0, 3)).executes(ctx ->
+                                        spawnRival(ctx.getSource().getPlayerOrThrow(), IntegerArgumentType.getInteger(ctx, "variant")))))
                         .then(CommandManager.literal("reset").executes(ctx -> {
                             ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
                             set(p, SData.DEFAULT);

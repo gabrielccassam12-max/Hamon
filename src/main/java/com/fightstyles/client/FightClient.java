@@ -47,6 +47,8 @@ public class FightClient implements ClientModInitializer {
                             new CubeParticle(world, x, y, z, vx, vy, vz, sprites, pf));
         }
 
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(com.fightstyles.entity.ModEntities.RIVAL, RivalRenderer::new);
+
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, helper, context) -> {
             if (entityRenderer instanceof PlayerEntityRenderer r) helper.register(new StyleFeature(r));
         });

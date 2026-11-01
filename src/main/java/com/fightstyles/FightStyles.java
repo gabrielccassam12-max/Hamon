@@ -30,6 +30,7 @@ public class FightStyles implements ModInitializer {
     public void onInitialize() {
         StyleConfig.load();
         ModParticles.init();
+        com.fightstyles.entity.ModEntities.init();
         ModItems.init();
         Effects.init();
         Scheduler.init();
