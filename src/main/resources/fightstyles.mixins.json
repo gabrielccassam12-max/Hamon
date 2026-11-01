@@ -1,0 +1,13 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.fightstyles.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "PlayerPoseMixin",
+    "CameraFxMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

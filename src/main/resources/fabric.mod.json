@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "fightstyles",
+  "version": "0.1.0",
+  "name": "Jojo Fighting Styles",
+  "description": "Hamon, Spin e Vampirismo: três estilos de luta com técnicas, rankings e efeitos de cubos brilhantes.",
+  "authors": [
+    "Gabriel"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.fightstyles.FightStyles"
+    ],
+    "client": [
+      "com.fightstyles.client.FightClient"
+    ]
+  },
+  "mixins": [
+    "fightstyles.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
