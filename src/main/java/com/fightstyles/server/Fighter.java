@@ -157,7 +157,7 @@ public final class Fighter {
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (GUARD) return true;
             if (!(entity instanceof ServerPlayerEntity sp)) {
-                if (entity.isUndead() && source.getAttacker() instanceof ServerPlayerEntity ap && get(ap).style() == Style.HAMON) {
+                if (entity.getType().isIn(net.minecraft.registry.tag.EntityTypeTags.UNDEAD) && source.getAttacker() instanceof ServerPlayerEntity ap && get(ap).style() == Style.HAMON) {
                     GUARD = true;
                     try {
                         entity.damage(source, amount * (float) StyleConfig.INSTANCE.undeadBonus);
@@ -210,7 +210,7 @@ public final class Fighter {
             if (st == null || s == null || world.getTime() - s.lastCast > 80) return;
             addXp(sp, st, 10);
             d = get(sp).addStat(SData.ST_KILLS + st.ordinal(), 1);
-            if (killed.isUndead()) d = d.addStat(SData.ST_UNDEAD, 1);
+            if (killed.getType().isIn(net.minecraft.registry.tag.EntityTypeTags.UNDEAD)) d = d.addStat(SData.ST_UNDEAD, 1);
             set(sp, d);
             if (st == Style.VAMPIRE) gainBlood(sp, 12);
         });
